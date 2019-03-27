@@ -1,0 +1,53 @@
+.navbar-lower {
+  @media only screen and (max-width: 600px) {height:49px;} // SMALL
+  @media only screen and (min-width: 600px) and (max-width: 992px) {max-height:29px;} // MEDIUM
+  @media only screen and (min-width: 993px) {height:112px;} // LARGE
+}
+
+html, body { overflow-x: hidden; padding: 0px;}
+table, th, td {
+  border: 1px solid black;
+}
+
+#footer { /* position must be absolute and bottom must be 0 */
+  height: 100px;
+  width: 100%;
+  background: rgba(255,255,255,0.2);
+  position: absolute;
+  bottom: 0;
+}
+
+img {
+  max-width:100%;
+}
+
+.icon-block {
+  padding: 0 15px;
+}
+.icon-block .material-icons {
+  font-size: inherit;
+}
+
+.brand-logo {
+  font-size: 1.7em !important;
+}
+
+#mobile-demo a {
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+a,
+a:focus,
+a:hover {
+  color: #fff;
+}
+
+.btn-secondary,
+.btn-secondary:hover,
+.btn-secondary:focus {
+  color: #333;
+  text-shadow: none;
+  background-color: #fff;
+  border: .05rem solid #fff;
+}

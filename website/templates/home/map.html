@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block content %}
+<body>
+
+    <h1 style="color:#00a79b;font-size:56px;"><center>Air Quality Map<br \>
+        <b style="font-weight:bold;color:#00a79b;font-weight:20px;">Pollution in Real-time</b></center>
+    </h1>
+    <div style="padding-left:10px;padding-right:10px;">
+      <p>
+      Air pollution is dynamic and changes throughout the day and even from street to street depending on many conditions.
+      This air pollution map helps you understand where air pollution is better and worse, with key air pollutants.
+      You can also get to know the air pollutant sources, their health effects, health recommendations, air pollution forecast,
+      and air quality over the last day by clicking on those locations.
+      </p>
+    </div>
+
+<div id="map" class="z-depth-2" style="width:90%;height:400px;margin-left:auto; margin-right:auto;"></div>
+
+<script>
+	function myMap() { 
+	var locations = [
+         ['RK Puram', 28.566008, 77.176743,0, 'http://35.229.111.190:8000/home/details/RK%20Puram', 'PM 2.5'],
+         ['Mandir Marg', 28.633845,77.200235,1, 'http://35.229.111.190:8000/home/details/Mandir%20Marg','PM 2.5'],
+         ['Punjabi Bagh', 28.661975, 77.124156,2, 'http://35.229.111.190:8000/home/details/Punjabi%20Bagh','PM 2.5'],
+         ['Okhla', 28.560280,77.291332 ,3, 'http://35.229.111.190:8000/home/details/Okhla','PM 2.5'],
+         ['Rohini',28.749472,77.056533 ,4, 'http://35.229.111.190:8000/home/details/Rohini','PM 2.5']
+
+ ];
+
+	var locations1 = [
+         new google.maps.LatLng(28.566008, 77.176743),
+          new google.maps.LatLng(28.633845,77.200235),
+         new google.maps.LatLng(28.661975, 77.124156),
+          new google.maps.LatLng(28.560280,77.291332),
+         new google.maps.LatLng(28.749472,77.056533)
+
+ ];
+
+
+var map = new google.maps.Map(document.getElementById('map'), {
+  zoom: 10,
+ center: new google.maps.LatLng(28.704059, 77.102490),
+ mapTypeId: google.maps.MapTypeId.ROADMAP
+});
+
+var infowindow = new google.maps.InfoWindow();
+
+var marker, i;
+
+for (i = 0; i < locations.length; i++) {
+  marker = new google.maps.Marker({
+   position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+   map: map,
+  title: locations[i][0],
+   url: locations[i][4],
+	  icon: {
+		  labelOrigin: new google.maps.Point(40,15),
+		  url: "{% static 'home/images/map-icon.png' %}",
+	  },
+  label: { color: '#e53935', fontWeight: 'bold', fontSize: '15px', text: locations[i][0]}
+  });
+
+ google.maps.event.addListener(marker, 'mouseover', (function(marker, i) {
+   return function() {
+     infowindow.setContent(locations[i][5]);
+     infowindow.open(map, marker);
+   }
+ })(marker, i));
+
+      google.maps.event.addListener(marker, 'click', (function(marker, i) {
+   return function() {
+     infowindow.setContent(locations[i][5]);
+     infowindow.open(map, marker);
+     window.location.href = this.url;
+   }
+ })(marker, i));
+
+    }
+
+ var pointArray = new google.maps.MVCArray(locations1);
+
+  // what data for the heatmap and how to display it
+  heatmap = new google.maps.visualization.HeatmapLayer({
+    data: pointArray,
+    radius: 50
+  });
+
+  // placing the heatmap on the map
+  heatmap.setMap(map);
+}
+</script>
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCNcNYY-A2pG1C11bNn7Qv7I_Y-dELrQQ&callback=myMap&libraries=visualization"></script>
+</body>
+ {% endblock %}

@@ -1,0 +1,147 @@
+{% load pwa %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en" >
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		{% progressive_web_app_meta %}
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<title>{% block title %}Pollution{% endblock %}</title>
+	<!-- Bootstrap -->
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	<link rel = 'stylesheet' href="{% static 'home/base.css' %}">
+	<link rel="stylesheet" href="{% static 'home/home.css' %}">
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet"/>
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet"/>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{% static 'home/base.css' %}"/>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="" />
+	<meta name="keywords" content="" />
+	<link rel="stylesheet" href="{% static 'home/home.css' %}">
+	<link rel="manifest" href="{% static 'manifest.json' %}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+
+
+	{% block styles %}
+	{% endblock %}
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+	<!-- jQuery -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="https://github.com/thecreation/breakpoints-js/blob/master/dist/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+	<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+	<script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+
+	<script>
+
+		document.addEventListener("DOMContentLoaded", function(){
+			$('.preloader-background').delay(1700).fadeOut('slow');
+
+			$('.preloader-wrapper')
+				.delay(1700)
+				.fadeOut();
+		});
+		$(document).ready(function() {
+		$('.preloader-background').delay(1700).fadeOut('slow');
+
+			$('.preloader-wrapper')
+				.delay(1700)
+				.fadeOut();
+		});
+
+	</script>
+	<style>
+.preloader-background {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #eee;
+
+	position: fixed;
+	z-index: 100;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;	
+}
+
+body {
+	background-image: url("{% static 'home/images/dust_scratches.png' %}");
+	background-repeat:repeat;
+}
+	</style>
+	</head>
+	<body {% block body_style %} {% endblock %}>
+		<div class="preloader-background">
+			<div class="preloader-wrapper big active">
+				<div class="spinner-layer spinner-green-only">
+					<div class="circle-clipper left">
+						<div class="circle"></div>
+					</div>
+					<div class="gap-patch">
+						<div class="circle"></div>
+					</div>
+					<div class="circle-clipper right">
+						<div class="circle"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<nav style="background-color:#23a15f;background: linear-gradient(70deg,#23a15f,#00a79b);">
+			<div class="nav-wrapper">
+				<a href="{% url 'home:home' %}" class="brand-logo">CLair</a>
+				<a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+				<ul class="right hide-on-med-and-down">
+					<li {% if request.resolver_match.url_name == "home" %}class="active"{% endif %}><a href="{% url 'home:home' %}">Home</a></li>
+					<li {% if request.resolver_match.url_name == "maps" %}class="active"{% endif %}><a href="{% url 'home:maps' %}">Map</a></li>
+				</ul>
+			</div>
+		</nav>
+
+		<ul class="sidenav" id="mobile-demo">
+			<li {% if request.resolver_match.url_name == "home" %}class="active"{% endif %}><a href="{% url 'home:home' %}">Home</a></li>
+			<li {% if request.resolver_match.url_name == "maps" %}class="active"{% endif %}><a href="{% url 'home:maps' %}">Map</a></li>
+		</ul>
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				var elems = document.querySelectorAll('.sidenav');
+				var instances = M.Sidenav.init(elems, options);
+			});
+
+// Or with jQuery
+
+$(document).ready(function(){
+	$('.sidenav').sidenav();
+});
+		</script>
+		<div id = "content">
+			{% block content %}{% endblock %}
+		</div>
+
+		<footer class="page-footer footer-fixed " style="background-color:#00a79b; background: linear-gradient(70deg,#00a79b,#23a15f);bottom:0;left:0;width:100%;">
+			<div class="container" style="padding-bottom:20px;background-color:#00a79b; background: linear-gradient(70deg,#00a79b,#23a15f">
+				<center> © 2018 Copyright Celestini Team India </center>
+			</div>
+		</footer>
+	</body>
+	<script type="text/javascript">
+		$('.sidenav').sidenav();
+	</script>
+</html>

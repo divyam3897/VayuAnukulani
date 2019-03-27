@@ -1,0 +1,679 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block content %}
+<style>
+.table-responsive-vertical {
+
+  @media screen and (max-width: 768px) {
+
+    // Tighten up spacing
+    > .table {
+      margin-bottom: 0;
+      background-color: transparent;
+      > thead,
+      > tfoot {
+        display: none;
+      }
+
+      > tbody {
+        display: block;
+
+        > tr {
+          display: block;
+          border: 1px solid @table-border-color;
+          border-radius: 2px;
+          margin-bottom: @table-cell-padding;
+
+          > td {
+            background-color: @table-bg;
+            display: block;
+            vertical-align: middle;
+            text-align: right;
+          }
+          > td[data-title]:before {
+            content: attr(data-title);
+            float: left;
+            font-size: inherit;
+            font-weight: @table-header-font-weight;
+            color: @table-header-font-color;
+          }
+        }
+      }
+    }
+  }
+
+@media (max-width: 480px) {
+#outer {
+    width: 500px;
+    height: 300px;
+    z-index: -1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+#grouped-bar {
+    width: 1000px;
+    height: 600px;
+}
+svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+}
+</style>
+<script>
+   $(document).ready(function() {
+           $('ul.tabs').tabs();
+swipeable : true,
+           $("#btnContinue").click(function() {
+                   $('ul.tabs').tabs('select_tab', 'test2');
+           });
+   });
+   function draw_bar(selector,data) {
+   var LABELS = ["PM2.5", "PM10","NO2","SO2"];
+   data.forEach(function(d) {
+           d.date = d.date.slice(14,23);
+   })
+    var w = window,
+    d = document,
+    e = d.documentElement,
+    g = d.getElementsByTagName('body')[0],
+    x = w.innerWidth || e.clientWidth || g.clientWidth,
+    y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+   var height = 200;
+   var width = 4 * height;
+console.log("check",w.innerWidth, w.innerHeight);
+   var margin = { top: 20, right: 70, bottom: 50, left: 50 };
+   var svg = d3.select(selector)
+           .append("svg")
+           .attr("width", width + margin.left + margin.right)
+           .attr("height", height + margin.top + margin.bottom)
+           .append("g")
+           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+   var div = d3.select("body").append("div")
+    .classed("svg-container", true)
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 600 400")
+    .classed("svg-content-responsive", true);
+
+   var color = d3.scaleOrdinal().range(["#05668d", "#028090", "#00a896", "#02c39a"]);
+   
+   var x = d3.scaleBand().rangeRound([0, width])
+           .padding(0.1),
+           y = d3.scaleLinear().rangeRound([height, 0]);
+   
+   var g = svg.append("g")
+           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+   var ymaxdomain = d3.max(data, function(d) {
+           return +d.value;
+   });
+   x.domain(data.map(function(d) {
+           return d.date
+   }));
+   y.domain([0, ymaxdomain]);
+   
+   var x1 = d3.scaleBand()
+           .rangeRound([0, x.bandwidth()])
+           .padding(0.05)
+           .domain(data.map(function(d) {
+                   return d.Group;
+           }));
+   
+   color.domain(data.map(function(d) {
+           return d.Group;
+   }));
+   
+   var groups = g.selectAll(null)
+           .data(data)
+           .enter()
+           .append("g")
+           .attr("transform", function(d) {
+                   return "translate(" + x(d.date) + ",0)";
+           })
+   
+   var bars = groups.selectAll(null)
+           .data(function(d) {
+                   return [d]
+           })
+           .enter()
+           .append("rect")
+           .attr("x", function(d, i) {
+                   return x1(d.Group)
+           })
+           .attr("y", function(d) {
+                   return y(d.value);
+           })
+           .attr("width", x1.bandwidth())
+           .attr("height", function(d) {
+                   return height - +y(d.value);
+           })
+           .attr("fill", function(d) {
+                   return color(d.Group)
+           })
+
+    g.selectAll("text.bar")
+      .data(data)
+    .enter().append("text")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.date) + x1(d.Group)*1.1; })
+      .attr("y", function(d) { return y(d.value)-10; })
+      .text(function(d) { return d.value; });
+   
+   g.append("g")
+           .attr("class", "axis")
+           .attr("transform", "translate(0," + height + ")")
+           .call(d3.axisBottom(x));
+   
+   g.append("g")
+           .attr("class", "axis")
+           .call(d3.axisLeft(y).ticks(null, "s"))
+           .append("text")
+           .attr("x", 2)
+           .attr("y", y(y.ticks().pop()) + 0.5)
+           .attr("dy", "0.32em")
+           .attr("fill", "#000")
+           .attr("font-weight", "bold")
+           .attr("text-anchor", "start")
+
+   var legend = g.append("g")
+           .attr("font-family", "sans-serif")
+           .attr("font-size", 10)
+           .attr("text-anchor", "end")
+           .selectAll("g")
+           .data(LABELS.slice())
+           .enter().append("g")
+           .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+   
+   legend.append("rect")
+           .attr("x", width - 50)
+           .attr("width", 15)
+           .attr("height", 15)
+           .attr("fill", color)
+           .attr("stroke", color)
+           .attr("stroke-width",2)
+           .on("click",function(d) { update(d) });
+   
+   legend.append("text")
+           .attr("x", width - 2)
+           .attr("y", 9.5)
+           .attr("dy", "0.32em")
+           .text(function(d) { return d; });
+   
+   } 
+   
+   
+   function draw_pie(selector, data) {
+   var LABELS = ["PM2.5","PM10","NO2","SO2"];
+   var height = 200,
+           width =  height,
+           radius = Math.min(width, height) / 2;
+   var margin = { top: 40, right: 30, bottom: 50, left: 40 };
+   
+   var color = d3.scaleOrdinal()
+           .range(["#05668d","#028090","#f0f3bd","#02c39a"]);
+   
+   var arc = d3.arc()
+           .outerRadius(radius - 10)
+           .innerRadius(0);
+   
+   var labelArc = d3.arc()
+           .outerRadius(radius - 40)
+           .innerRadius(radius - 40);
+   
+   var pie = d3.pie()
+           .sort(null)
+           .value(function(d) { return d; });
+   
+   var svg = d3.select(selector).append("svg")
+           .attr("width", width + margin.left + margin.right)
+           .attr("height", height + margin.top + margin.bottom)
+           .append("g")
+           .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+   
+   var g = svg.selectAll(".arc")
+           .data(pie(data))
+           .enter().append("g")
+           .attr("class", "arc");
+   
+   g.append("path")
+           .attr("d", arc)
+           .style("fill", function(d) { return color(d.data); });
+   
+   g.append("text")
+           .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
+           .attr("dy", ".35em")
+           .text(function(d) { return +d.data; });
+   
+   var legend = g.append("g")
+           .attr("font-family", "sans-serif")
+           .attr("font-size", 10)
+           .attr("text-anchor", "end")
+           .selectAll("g")
+           .data(LABELS.slice())
+           .enter().append("g")
+           .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+   
+   legend.append("rect")
+           .attr("x", width - 80)
+           .attr("width", 15)
+           .attr("height", 15)
+           .attr("fill", color)
+           .attr("stroke", color)
+           .attr("stroke-width",2)
+           .on("click",function(d) { update(d) });
+   
+   legend.append("text")
+           .attr("x", width - 30)
+           .attr("y", 9.5)
+           .attr("dy", "0.32em")
+           .text(function(d) { return d; });
+   
+   }
+   
+</script>
+<div class="row">
+   <div class="col s12">
+      <ul class="tabs" style="overflow-x: hidden">
+         <li class="tab col s3"><a href="#past">Historical values</a></li>
+         <li class="tab col s3"><a class="active" href="#graphs">Graphs</a></li>
+         <li class="tab col s3"><a href="#classification">Future classes</a></li>
+         <li class="tab col s3"><a href="#regression">Future values</a></li>
+      </ul>
+   </div>
+</div>
+<div id="past">
+   <h1 style="color:#00a79b;font-size:56px;">
+      <center>Air Quality Data<br \>
+         <b style="font-weight:bold;color:#00a79b;font-weight:20px;">{{place}}</b>
+      </center>
+   </h1>
+   <div style="padding-left:10px;padding-right:10px;">
+      <p>
+         Monitor pollution and air quality in Delhi using our air quality data. We display the Air Quality index for the past 24 hours
+         for various pollutants. The values are displayed to display the trends in the past 24 hours to help you 
+         make informed decisions about what activities you do outside, when and for how much time.<br>
+      </p>
+   </div>
+   <div class="table-responsive-vertical">
+   <table class="table centered">
+      <thead>
+         <tr>
+            <th>Date</th>
+            <th>PM 2.5</th>
+            <th>PM 10</th>
+            <th>Nitrogen dioxide</th>
+            <th>Sulpher dioxide</th>
+            <th>Carbon monoxide</th>
+            <th>Humidity</th>
+         </tr>
+      </thead>
+      <tbody>
+         {% for record in pollutants %}
+         <tr>
+            <td>{{record.date}}</td>
+            <td>{{record.pm25}}</td>
+            <td>{{record.pm10}}</td>
+            <td>{{record.no2}}</td>
+            <td>{{record.so2}}</td>
+            <td>{{record.co}}</td>
+            <td>{{record.hum}}</td>
+         </tr>
+         {% endfor %}
+      </tbody>
+   </table>
+   </div>
+  <h1 style="color:#00a79b;font-size:40px;">
+      <center>
+         <b style="font-weight:bold;color:#00a79b;font-weight:20px;">About air pollutants</b>
+      </center>
+   </h1>
+   <div class="table-responsive-vertical">
+    <table class="centered">
+        <thead>
+          <tr>
+              <th>Pollution</th>
+              <th>Abbreviation</th>
+              <th>Description</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Carbon Monoxide</td>
+            <td>CO</td>
+            <td>Carbon Monoxide (CO) is a colorless, odorless, very toxic gas produced by the incomplete combustion of carbon-containing fuels, most notably by gasoline powered engines, power plants, and wood fires. CO can cause harmful health effects by reducing oxygen delivery to the body's organs (like the heart and brain) and tissues. At extremely high levels, CO can cause death.</td>
+          </tr>
+          <tr>
+            <td>Sulphuer Dioxide</td>
+	    <td>SO<sub>2</sub></td>
+	    <td>Sulfur dioxide (SO<sub>2</sub>) is one of a group of highly reactive gasses known as "oxides of sulfur." The largest sources of SO<sub>2</sub> emissions are from fossil fuel combustion at power plants (73%) and other industrial facilities (20%). Smaller sources of SO<sub>2</sub> emissions include industrial processes such as extracting metal from ore, and the burning of high sulfur containing fuels by locomotives, large ships, and non-road equipment. SO<sub>2</sub> is linked with a number of adverse effects on the respiratory system. </td>
+          </tr>
+          <tr>
+            <td>Nitrogden Dioxide</td>
+	    <td>NO<sub>2</sub></td>
+	    <td>Nitrogen dioxide (NO<sub>2</sub>) is one of a group of highly reactive gasses known as "oxides of nitrogen", or "nitrogen oxides (NO<sub>x</sub>)". Other nitrogen oxides include nitrous acid and nitric acid. While EPA's National Ambient Air Quality Standard covers this entire group of NO<sub>x</sub>, NO<sub>2</sub> is the component of greatest interest and the indicator for the larger group of nitrogen oxides. NO<sub>2</sub> forms quickly from emissions from cars, trucks and buses, power plants, and off-road equipment. In addition to contributing to the formation of ground-level ozone and fine particle pollution, NO<sub>2</sub> is linked with a number of adverse effects on the respiratory system. </td>
+          </tr>
+          <tr>
+            <td>Particulate Matter</td>
+	    <td>PM<sub>2.5</sub>and PM<sub>10</sub></td>
+	    <td>Particle pollution (also called particulate matter or PM) is the term for a mixture of solid particles and liquid droplets found in the air. Particle pollution includes inhalable coarse particles, with diameters larger than 2.5 micrometers and smaller than 10 micrometers and fine particles, with diameters that are 2.5 micrometers and smaller. Some particles, known as primary particles, are emitted directly from a source, such as construction sites, unpaved roads, fields, smokestacks or fires.</td>
+        </tbody>
+      </table>
+   </div>
+</div>
+<div id="graphs">
+   <h1 style="color:#00a79b;font-size:56px;">
+      <center>Air Quality Index Graphs<br \>
+         <b style="font-weight:bold;color:#00a79b;font-weight:20px;">{{place}}</b>
+      </center>
+   </h1>
+   <div style="padding-left:10px;padding-right:10px;font-size:16px;">
+	   <center> <p>
+         The <b>Air quality index</b> is an index for reporting daily air quality. It tells you how clean or polluted your air is, and what associated health effects might be a concern for you. The AQI focuses on health effects you may experience within a few hours or days after breathing polluted air.
+	 The <b>higher the AQI value, the greater the level of air pollution and the greater the health concern.</b> For example, an AQI value of 50 represents good air quality with little potential to affect public health, while an AQI value over 300 represents hazardous air quality. </br>
+         We display grouped bar charts and pie charts for different pollutants including PM2.5, PM10, NO2, SO2. The graphs are displayed at an interval of 4 hours of a day
+         to help you observe different trends during the day to keep you safe for the next.<br>
+      </p>
+	   </center>
+   </div>
+  <center>    <b style="font-weight:bold;color:#00a79b;font-weight:20px;"><div id="source" style="color:#00a79b;font-size:20px;font-weight:40px;"></div></center></b>
+   <div class="row" id="outer">
+	   <div id="grouped-bar" class="col-md-12  col-xs-12 thumb" style="overflow-x: auto;"></div>
+   </div>
+
+   <h5 style="color:#00a79b;font-size:40px;">
+  <center>Percentage Contribution</center></h5>
+   <div class="row" align="center">
+      <div id="pie-4" class="col-md-4"></div>
+      <div id="pie-8" class="col-md-4"></div>
+      <div id="pie-12" class="col-md-4"></div>
+   </div>
+   <div class="row" align="center">
+      <div id="pie-16" class="col-md-4"></div>
+      <div id="pie-20" class="col-md-4"></div>
+      <div id="pie-24" class="col-md-4"></div>
+   </div>
+
+   <span style="color:#00a79b;font-size:20px;">
+	   <center><b style="font-weight:bold;color:#00a79b;font-weight:20px;">Disclaimer:</b> All values in bar graphs are Air Quality Index and all values in pie charts are in percentage </center></span>
+
+   <script>
+      data = []
+      data_pie = []
+      var count = 0;
+      {% for record in pollutants %}
+      var total = parseInt('{{record.pm25}}') + parseInt('{{record.pm10}}') + parseInt('{{record.no2}}') + parseInt('{{record.so2}}');
+var total1 = parseInt('{{record.pm25}}') + parseInt('{{record.pm10}}') + parseInt('{{record.no2}}') + parseInt('{{record.so2}}') + parseInt('{{record.co}}');
+      var pm25 = (('{{record.pm25}}'/total).toFixed(15))*100;
+      var pm10 = (('{{record.pm10}}'/total).toFixed(15))*100;
+      var no2 = (('{{record.no2}}'/total).toFixed(15))*100;
+      var so2 = (('{{record.so2}}'/total).toFixed(15))*100;
+ 
+       var list_max = []
+
+       var sources = ["Road dust and Traffic Emission", "Road dust and Traffic Emission", "Coal Industries", "Natural gas industries", "Combustion of fossil fuels"]
+      var pm25_1 = (('{{record.pm25}}'/total1).toFixed(15))*100;
+      var pm10_1 = (('{{record.pm10}}'/total1).toFixed(15))*100;
+      var no2_1 = (('{{record.no2}}'/total1).toFixed(15))*100;
+      var so2_1 = (('{{record.so2}}'/total1).toFixed(15))*100;
+      var co_1 = (('{{record.co}}'/total1).toFixed(15))*100;
+      list_max.push(pm25_1, pm10_1, no2_1, so2_1, co_1);
+      var indexOfMaxValue = list_max.reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
+document.getElementById("source").innerHTML = "The major current source of pollution is " + sources[indexOfMaxValue];
+      console.log(indexOfMaxValue, list_max, sources[indexOfMaxValue]);
+      data_pie.push([Math.round(pm25),Math.round(pm10),Math.round(no2),Math.round(so2)]);
+      data.push({
+      Group: "pm25",
+      date: '{{record.date}}',
+      value: '{{record.pm25}}'
+      });
+      data.push({
+      Group: "pm10",
+      date: '{{record.date}}',
+      value: '{{record.pm10}}'
+      });
+      data.push({
+      Group: "no2",
+      date: '{{record.date}}',
+      value: '{{record.no2}}'
+      });
+      data.push({
+      Group: "so2",
+      date: '{{record.date}}',
+      value: '{{record.so2}}'
+      });
+      {% endfor %}
+      
+      draw_bar("#grouped-bar",  data);
+      draw_pie("#pie-4",  data_pie[0]);
+      draw_pie("#pie-8",  data_pie[1]);
+      draw_pie("#pie-12",  data_pie[2]);
+      draw_pie("#pie-16",  data_pie[3]);
+      draw_pie("#pie-20",  data_pie[4]);
+      draw_pie("#pie-24",  data_pie[5]);
+window.addEventListener("resize", draw_bar("#grouped-bar", data));
+   </script>
+   <div class="table-responsive-vertical  teal lighten-2" style="text-align:center;color:white; font-size:large;">Air Quality levels</div>
+   <table class="table highlight centered">
+      <thead>
+         <tr>
+            <td>AQI</td>
+            <td>Air pollution level</td>
+            <td>Health Implications</td>
+            <td>Cautionary Statement (For PM 2.5)</td>
+         </tr>
+      </thead>
+      <tbody>
+         <tr style="background-color:#009966;">
+            <td nowrap=true>0 - 50</td>
+            <td>Good</td>
+            <td>Air quality is considered satisfactory, and air pollution poses little or no risk</td>
+            <td>None</td>
+         </tr>
+         <tr style="background-color:#ffde33;">
+            <td nowrap=true>51 - 100</td>
+            <td>Moderate</td>
+            <td>Air quality is acceptable; however, for some pollutants there may be a moderate health concern for a very small number of people who are unusually sensitive to air pollution.</td>
+            <td>Active children and adults, and people with respiratory disease, such as asthma, should limit prolonged outdoor exertion.</td>
+         </tr>
+         <tr style="background-color:#ff9933;">
+            <td nowrap=true>101 - 150</td>
+            <td>Unhealthy for sensitive groups</td>
+            <td>Members of sensitive groups may experience health effects. The general public is not likely to be affected.</td>
+            <td>Active children and adults, and people with respiratory disease, such as asthma, should limit prolonged outdoor exertion.</td>
+         </tr>
+         <tr style="background-color:#cc0033;color:white;">
+            <td nowrap=true>151 - 200</td>
+            <td>Unhealthy</td>
+            <td>Everyone may begin to experience health effects; members of sensitive groups may experience more serious health effects</td>
+            <td>Active children and adults, and people with respiratory disease, such as asthma, should avoid prolonged outdoor exertion; everyone else, especially children, should limit prolonged outdoor exertion</td>
+         </tr>
+         <tr style="background-color:#660099;color:white;">
+            <td nowrap=true>201-300</td>
+            <td>Very Unhealthy</td>
+            <td>Health warnings of emergency conditions. The entire population is more likely to be affected.</td>
+            <td>Active children and adults, and people with respiratory disease, such as asthma, should avoid all outdoor exertion; everyone else, especially children, should limit outdoor exertion.</td>
+         </tr>
+         <tr style="background-color:#7e0023;color:white;">
+            <td nowrap=true>300+</td>
+            <td>Hazardous</td>
+            <td>Health alert: everyone may experience more serious health effects</td>
+            <td>Everyone should avoid all outdoor exertion</td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+<div id="classification" class="col s12">
+   <h1 style="color:#00a79b;font-size:56px;">
+      <center>Air Quality Forecasting<br \>
+         <b style="font-weight:bold;color:#00a79b;font-weight:20px;">{{place}}</b>
+      </center>
+   </h1>
+   <script>
+      var pollution_map = {
+              '0': 'low',
+              '1': 'moderate',
+              '2': 'bad',
+              '3': 'hazardous'
+      }
+      var color_map = {
+      'good': 'green',
+      'bad': 'red',
+      'moderate': "#FDD9B5"
+      }
+      classes = []
+      dates = []
+      {% for record in classes %}
+        dates.push('{{record.date}}')
+       classes.push(pollution_map['{{record.pm25}}'])
+        classes.push(pollution_map['{{record.so2}}'])
+        classes.push(pollution_map['{{record.no2}}'])
+       classes.push(pollution_map['{{record.pm10}}'])
+      {% endfor %}
+console.log(classes);
+      var count = 0
+      window.onload = function() {
+      var tr_rows = document.getElementById('predTable').getElementsByTagName('tr');
+	      console.log(tr_rows[1].cells[2]);
+
+	      tr_rows[1].cells[0].innerHTML = dates[0]
+	      tr_rows[2].cells[0].innerHTML = dates[1]
+	      tr_rows[3].cells[0].innerHTML = dates[2]
+	      tr_rows[4].cells[0].innerHTML = dates[3]
+
+	      tr_rows[1].cells[1].innerHTML = classes[0]
+	      tr_rows[2].cells[1].innerHTML = classes[1]
+	      tr_rows[3].cells[1].innerHTML  = classes[2]
+	      tr_rows[4].cells[1].innerHTML = classes[3]
+
+
+	      tr_rows[1].cells[2].innerHTML = classes[4]
+	      tr_rows[2].cells[2].innerHTML  = classes[5]
+	      tr_rows[3].cells[2].innerHTML  = classes[6]
+	      tr_rows[4].cells[2].innerHTML  = classes[7]
+
+	      tr_rows[1].cells[3].innerHTML = classes[8]
+	      tr_rows[2].cells[3].innerHTML  = classes[9]
+	      tr_rows[3].cells[3].innerHTML  = classes[10]
+	      tr_rows[4].cells[3].innerHTML  = classes[11]
+
+	      tr_rows[1].cells[4].innerHTML = classes[12]
+	      tr_rows[2].cells[4].innerHTML = classes[13]
+	      tr_rows[3].cells[4].innerHTML = classes[14]
+	      tr_rows[4].cells[4].innerHTML = classes[15]
+      };
+   </script>
+   <div class="table-responsive-vertical">
+   <table class="table" id="predTable">
+      <thead>
+         <tr>
+            <td>Pollutants</td>
+            <td>PM 2.5</td>
+            <td>SO2</td>
+            <td>NO2</td>
+            <td>PM10</td>
+         </tr>
+      </thead>
+      <tbody>
+         <tr class="pm25">
+            <td nowrap=true>PM 2.5</td>
+            <td>Good</td>
+            <td>Moderate</td>
+            <td>Hazardous</td>
+            <td>Hazardous</td>
+         </tr>
+         <tr >
+            <td nowrap=true>NO2</td>
+            <td>Good</td>
+            <td>Moderate</td>
+            <td>Hazardous</td>
+            <td>Hazardous</td>
+         </tr>
+         <tr>
+            <td nowrap=true>CO</td>
+            <td>Good</td>
+            <td>Moderate</td>
+            <td>Hazardous</td>
+            <td>Hazardous</td>
+         </tr>
+         <tr>
+            <td nowrap=true>SO2</td>
+            <td>Good</td>
+            <td>Moderate</td>
+            <td>Hazardous</td>
+            <td>Hazardous</td>
+         </tr>
+      </tbody>
+   </table>
+   </div>
+</div>
+<div id="regression">
+   <h1 style="color:#00a79b;font-size:56px;">
+      <center>Air Quality Forecasting<br \>
+         <b style="font-weight:bold;color:#00a79b;font-weight:20px;">{{place}}</b>
+      </center>
+   </h1>
+
+   <div class="row" style="padding-left:90px;">
+     <div id="grouped-bar1" class="col-md-12  col-xs-12 thumb" style="overflow-x: auto;"></div>
+   </div>
+
+   <h5 style="color:#00a79b;font-size:40px;">
+  <center>Predicted Percentage Contribution</center></h5>
+   <div class="row" align="center">
+      <div id="pie-1_pred" class="col-md-4"></div>
+      <div id="pie-4_pred" class="col-md-4"></div>
+      <div id="pie-12_pred" class="col-md-4"></div>
+   </div>
+   <span style="color:#00a79b;font-size:20px;">
+	   <center><b style="font-weight:bold;color:#00a79b;font-weight:20px;">Disclaimer:</b> All values in bar graphs are in &#x3BC;g/m<sup>3</sup> and all values in pie charts are in percentage </center></span>
+
+   <script>
+      data = []
+      data_pie = []
+      {% for record in predictions %}
+      var pm25 = '{{record.pm25}}'/250
+      var pm10 = '{{record.pm10}}'/430
+      var no2 = '{{record.no2}}'/400
+      var so2 = '{{record.so2}}'/380
+      var total = pm25 + pm10 + no2 + so2
+      pm25 = ((pm25/total).toFixed(15))*100
+      pm10 = ((pm10/total).toFixed(15))*100
+      no2 = ((no2/total).toFixed(15))*100
+      so2 = ((so2/total).toFixed(15))*100
+      data_pie.push([Math.round(pm25),Math.round(pm10),Math.round(no2),Math.round(so2)]);
+      console.log(data_pie);
+      data.push({
+      Group: "pm25",
+      date: '{{record.date}}',
+      value: '{{record.pm25}}'
+      });
+      data.push({
+      Group: "pm10",
+      date: '{{record.date}}',
+      value: '{{record.pm10}}'
+      });
+      data.push({
+      Group: "no2",
+      date: '{{record.date}}',
+      value: '{{record.no2}}'
+      });
+      data.push({
+      Group: "so2",
+      date: '{{record.date}}',
+      value: '{{record.so2}}'
+      });
+      {% endfor %}
+      draw_bar("#grouped-bar1",  data.slice(0,data.length-4));
+      draw_pie("#pie-1_pred",  data_pie[0]);
+      draw_pie("#pie-4_pred",  data_pie[1]);
+      draw_pie("#pie-12_pred",  data_pie[2]);
+   </script>
+</div>
+{% endblock %}
+
+

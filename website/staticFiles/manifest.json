@@ -1,0 +1,25 @@
+{
+    "dir" : "ltr",
+    "lang" : "en",
+    "name" : "Pollution project",
+    "scope" : "/",
+    "display" : "standalone",
+    "start_url" : "/home",
+    "short_name" : "Pollution",
+    "theme_color" : "transparent",
+    "description" : "Pollution, Celestini India.",
+    "orientation" : "any",
+    "icons" : [
+        {
+            "src" : "home/images/icon-192x192.png",
+            "sizes" : "192x192",
+            "type" : "image/png"
+        },
+        {
+            "src" : "home/images/icon-128x128.png",
+            "sizes" : "128x128",
+            "type" : "image/png"
+        } 
+    ]
+}
+

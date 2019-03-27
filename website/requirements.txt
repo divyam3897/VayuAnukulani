@@ -1,0 +1,11 @@
+Django==2.0.4
+python_firebase==1.2
+requests==2.18.4
+whitenoise==3.3.1
+gunicorn==19.7.1
+django_cron==0.5.1
+beautifulsoup4==4.6.0
+urllib3==1.22
+APScheduler==3.0.0
+dj-database-url==0.2.1
+psycopg2==2.7.5

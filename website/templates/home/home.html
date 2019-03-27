@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block content %}
+<body class="is-preload">
+  <!-- Banner -->
+  <iframe class="z-depth-2" width=100% height="450" src="https://www.youtube.com/embed/e6rglsLy1Ys" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="margin-left:auto;margin-right:auto;"></iframe>
+  <!-- Highlights -->
+
+  <section "wrapper" >
+    <div>
+	    <div>
+      <header class="special" style="padding-top:20px;padding-bottom:50px;">
+        <h2 style="color:#00a79b;">About us</h2>
+        <p>The web application has been developed for you in collaboration with IIT Delhi and Marconi Society.
+        We decided to take advantage of our knowledge and experience to create a top-quality application that clearly 
+        displays air pollution data from around the Delhi and allows you to monitor pollution for any part of Delhi.</p>
+      </header>
+     </div>
+      <div style="background-color:#23a15f;background: linear-gradient(70deg,#23a15f,#00a79b); padding-top:10px;">
+        <h2 style="color:white;"><center>Facts</center></h2>
+        <div class="highlights " style="padding-left:30px;padding-right:30px;padding-bottom:60px;">
+          <section>
+            <div class="content" style="background-color:white;">
+              <data style="font-size:80px;font-family:Roboto,sans-serif;font-weight:900;width:263px;letter-spacing: -9px;color:#bf272d">10 k+</data>
+              <blockquote style="font-family:Roboto;font-size:24px;line-height:24px;">Pollution related Death toll/year.</blockquote>
+            </div>
+          </section>
+          <section>
+            <div class="content" style="background-color:white;">
+              <data style="font-size:80px;font-family:Roboto,sans-serif;font-weight:900;width:263px;letter-spacing: -7px;color:#bf272d">44%</data>
+              <blockquote style="font-family:Roboto;font-size:24px;line-height:24px;">Of Delhi school children have reduced lung function compared to other Indian cities.</blockquote>
+            </div>
+          </section>
+          <section>
+            <div class="content" style="background-color:white;">
+              <data style="font-size:80px;font-family:Roboto,sans-serif;font-weight:900;width:263px;letter-spacing: -7px;color:#bf272d">2015</data>
+              <blockquote style="font-family:Roboto;font-size:24px;line-height:24px;">WHO ranked Delhi as most polluted city.</blockquote>
+            </div>
+          </section>
+          <section>
+            <div class="content" style="background-color:white;">
+              <data style="font-size:70px;font-family:Roboto,sans-serif;font-weight:900;width:263px;letter-spacing: -7px;color:#bf272d">$560</data>
+              <data style="font-size:80px;font-family:Roboto,sans-serif;font-weight:900;width:263px;letter-spacing: -7px;color:#bf272d">billion</data>
+              <blockquote style="font-family:Roboto;font-size:24px;line-height:24px;">Lost in India due to air pollution.</blockquote>
+            </div>
+          </section>
+          <section>
+            <div class="content" style="background-color:white;">
+              <data style="font-size:80px;font-family:Roboto,sans-serif;font-weight:900;width:263px;letter-spacing: -9px;color:#bf272d">80k</data>
+              <blockquote style="font-family:Roboto;font-size:24px;line-height:24px;">Trucks plying daily.</blockquote>
+            </div>
+          </section>
+          <section>
+            <div class="content" style="background-color:white;">
+              <data style="font-size:80px;font-family:Roboto,sans-serif;font-weight:900;width:263px;letter-spacing: -9px;color:#bf272d">20+</data>
+              <blockquote style="font-family:Roboto;font-size:24px;line-height:24px;">Cigarettes you smoke if you live in Delhi.</blockquote>
+              <section>
+              </section>
+            </div>
+        </div>
+          </section>
+      </div>
+      <!-- CTA -->
+      <section class="wrapper" style="padding-top:1em;">
+	      <h2 style="color:#00a79b;"><center>We have multiple ways to protect you</center></h2><br/>
+        <div class="row" style="padding-bottom:20px;">
+          <div id="f1" class="column col-md-2 col-xs-8 col-xs-offset-2 centered">
+            <img src="{% static 'home/images/bar-chart.png' %}" alt="Snow" style="width:100%">
+            <br />
+            <h5><b style="font-weight:bold;color:#00a79b;font-weight:20px;">Real time forecasting</b></h5>
+	    <p style="font-weight:bold;color:#00a79b;font-weight:10px;text-align:justify;">We provide air pollution information upto 24 hours in advance as well as historical data to 
+	    understand causes and effects</p>
+          </div>
+          <div id="f2" class="column col-md-2 col-xs-8 col-md-offset-1 col-xs-offset-2 centered">
+            <img src="{% static 'home/images/pie-chart.png' %}" alt="Snow" style="width:100%;">
+            <br />
+            <h5><b style="font-weight:bold;color:#00a79b;font-weight:20px;">Real time graphs</b></h5>
+	    <p style="font-weight:bold;color:#00a79b;font-weight:10px;text-align:justify">We display real time and future graphs for air pollutants to help you understand the change and effects.</p>
+          </div>
+          <div id="f3" class="column col-md-2 col-xs-8 col-md-offset-1 col-xs-offset-2 centered">
+            <img src="{% static 'home/images/finance.png' %}" alt="Snow" style="width:100%;;">
+            <h5><b style="font-weight:bold;color:#00a79b;font-weight:20px;">Source Identification</b></center></h5>
+	    <p style="font-weight:bold;color:#00a79b;font-weight:10px;text-align:justify">We provide the source of pollution and different ways for protecting you.</p>
+          </div>
+        </div>
+      </section>
+
+      {% endblock %}
