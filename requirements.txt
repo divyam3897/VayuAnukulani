@@ -42,7 +42,7 @@ scipy==1.1.0
 seaborn==0.8.1
 six==1.11.0
 tensorboard==1.8.0
-tensorflow==1.8.0
+tensorflow==1.15.2
 termcolor==1.1.0
 tzlocal==1.5.1
 uritemplate==3.0.0
