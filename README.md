@@ -7,6 +7,20 @@ Anukulani. We proposed an end-to-end  solution to predict air quality for next 2
 
 **Contributor**: [Divyam Madaan](https://divyam3897.github.io/), [Radhika Dua](https://radhikadua123.github.io/)
 
+### Cite our work
+@article{madaan2019vayuanukulani,
+  title={VayuAnukulani: Adaptive Memory Networks for Air Pollution Forecasting},
+  author={Madaan, Divyam and Dua, Radhika and Mukherjee, Prerana and Lall, Brejesh},
+  journal={arXiv preprint arXiv:1904.03977},
+  year={2019}
+}
+
+@article{mukherjee2019vayuanukulani,
+  title={VayuAnukulani: Adaptive memory networks for air pollution forecasting},
+  author={MUKHERJEE, PRERANA and Madaan, Divyam and Dua, Radhika and Mukherjee, Prerana and Lall, Brejesh},
+  year={2019}
+}
+
 ### Idea
 We  present a system to  predict  air  quality for  next  24  hours  by  estimating  the  concentration  and  level
 of  different  air  pollutants  including  nitrogen  dioxide  (NO2), particulate  matter  (PM2.5 and PM10)  for  Delhi.  
