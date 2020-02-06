@@ -1,6 +1,6 @@
 Django==2.0.4
 python_firebase==1.2
-requests==2.18.4
+requests==2.20.0
 whitenoise==3.3.1
 gunicorn==19.7.1
 django_cron==0.5.1
